@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Lesson 7 — Graph Algorithms</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --sidebar-bg: #1c1c1c;
+  --sidebar-w: 220px;
+  --main-bg: #f2f1ec;
+  --card-bg: #ffffff;
+  --green: #3a7c52;
+  --text: #1a1a18;
+  --muted: #888;
+  --border: #e4e3dc;
+  --radius: 14px;
+}
+
+body {
+  font-family: 'Geist', -apple-system, sans-serif;
+  background: var(--sidebar-bg);
+  display: flex;
+  min-height: 100vh;
+  color: var(--text);
+}
+
+/* ── SIDEBAR ── */
+aside {
+  width: var(--sidebar-w);
+  background: var(--sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  padding: 24px 0;
+  flex-shrink: 0;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 18px 24px;
+  border-bottom: 1px solid #2e2e2e;
+  margin-bottom: 12px;
+}
+
+.logo-icon {
+  width: 32px; height: 32px;
+  background: var(--green);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+
+.logo-text { color: #fff; font-size: 13px; font-weight: 600; line-height: 1.2; }
+.logo-sub  { color: #555; font-size: 10px; }
+
+.nav-label {
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #444;
+  padding: 0 18px;
+  margin: 16px 0 6px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  margin: 0 8px;
+  border-radius: 8px;
+  color: #888;
+  font-size: 13px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background .15s, color .15s;
+}
+.nav-item:hover { background: #252525; color: #ccc; }
+.nav-item.active { background: #272727; color: #fff; font-weight: 500; }
+
+.nav-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 16px 18px 0;
+  border-top: 1px solid #262626;
+  color: #3a3a3a;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+/* ── MAIN ── */
+main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  background: var(--main-bg);
+  border-radius: 16px 0 0 16px;
+  min-height: 100vh;
+  padding: 32px 32px 60px;
+}
+
+/* ── TOP BAR ── */
+.topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.topbar-eyebrow { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+.topbar-title   { font-size: 22px; font-weight: 600; }
+.lesson-badge {
+  background: var(--green);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 5px 14px;
+  border-radius: 20px;
+  margin-top: 4px;
+}
+
+/* ── BANNER ── */
+.banner {
+  background: var(--green);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  color: #fff;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.banner-icon { font-size: 24px; flex-shrink: 0; }
+.banner-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.banner-desc  { font-size: 12px; opacity: .75; line-height: 1.5; }
+
+/* ── STATS ── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+}
+.stat-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 5px; }
+.stat-val   { font-size: 18px; font-weight: 600; }
+.stat-sub   { font-size: 10.5px; color: var(--muted); margin-top: 2px; }
+
+/* ── SECTION LABEL ── */
+.slabel {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.slabel em {
+  font-style: normal;
+  background: var(--border);
+  color: var(--muted);
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+/* ── ALGO CARDS ── */
+.algo-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+
+.algo-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow .18s, transform .18s;
+}
+.algo-card:hover {
+  box-shadow: 0 3px 16px rgba(0,0,0,.08);
+  transform: translateY(-1px);
+}
+
+.algo-num {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.algo-info { flex: 1; min-width: 0; }
+.algo-title { font-size: 13.5px; font-weight: 600; margin-bottom: 2px; }
+.algo-sub   { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.algo-tags { display: flex; gap: 5px; flex-shrink: 0; }
+.atag {
+  font-size: 10px;
+  padding: 3px 9px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  background: var(--main-bg);
+  white-space: nowrap;
+}
+
+.algo-arrow { color: #ccc; font-size: 18px; flex-shrink: 0; }
+
+/* ── TABLE ── */
+.table-wrap {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.table-head {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.table-head-title { font-size: 13px; font-weight: 600; }
+.table-head-sub   { font-size: 11px; color: var(--muted); }
+
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted); padding: 9px 18px; text-align: left;
+  background: #fafaf7; border-bottom: 1px solid var(--border);
+}
+tbody td {
+  font-size: 12.5px; padding: 10px 18px;
+  border-bottom: 1px solid #f0efe8; color: #444;
+}
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: #fafaf7; }
+tbody td:first-child { font-weight: 600; color: var(--text); }
+.mono { font-family: 'Courier New', monospace; font-size: 11px; color: #666; }
+
+/* ── ANIM ── */
+@keyframes fu {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.a1 { animation: fu .35s .05s both; }
+.a2 { animation: fu .35s .10s both; }
+.a3 { animation: fu .35s .15s both; }
+.a4 { animation: fu .35s .18s both; }
+.a5 { animation: fu .35s .21s both; }
+.a6 { animation: fu .35s .24s both; }
+
+@media (max-width: 680px) {
+  aside { display: none; }
+  main  { margin-left: 0; border-radius: 0; padding: 20px 16px 60px; }
+  .stats-row { grid-template-columns: 1fr 1fr; }
+  .algo-tags { display: none; }
+}
+</style>
+</head>
+<body>
+
+<aside>
+  <div class="logo">
+    <div class="logo-icon">𝒢</div>
+    <div>
+      <div class="logo-text">Graph Study</div>
+      <div class="logo-sub">Algorithm Animations</div>
+    </div>
+  </div>
+
+  <div class="nav-label">Lessons</div>
+  <a class="nav-item active" href="index.html">
+    <div class="nav-dot" style="background:#4a9463"></div> Lesson 7
+  </a>
+
+  <div class="nav-label">Algorithms</div>
+  <a class="nav-item" href="bfs_dfs_animation.html">
+    <div class="nav-dot" style="background:#4a7cc7"></div> BFS / DFS
+  </a>
+  <a class="nav-item" href="prims_two_examples.html">
+    <div class="nav-dot" style="background:#4a9463"></div> Prim's
+  </a>
+  <a class="nav-item" href="kruskals_example.html">
+    <div class="nav-dot" style="background:#c97c2e"></div> Kruskal's
+  </a>
+  <a class="nav-item" href="dijkstra_example.html">
+    <div class="nav-dot" style="background:#b94a4a"></div> Dijkstra's
+  </a>
+
+  <div class="sidebar-footer">
+    Chapter 13<br/>Graph Algorithms
+  </div>
+</aside>
+
+<main>
+  <div class="topbar a1">
+    <div>
+      <div class="topbar-eyebrow">Chapter 13</div>
+      <div class="topbar-title">Graph Algorithms</div>
+    </div>
+    <div class="lesson-badge">Lesson 7</div>
+  </div>
+
+  <div class="banner a2">
+    <div class="banner-icon">🌐</div>
+    <div>
+      <div class="banner-title">4 Interactive Animations</div>
+      <div class="banner-desc">Click any algorithm to open its step-by-step animation. Use Play, Pause, or Next Step to go at your own pace.</div>
+    </div>
+  </div>
+
+  <div class="stats-row a3">
+    <div class="stat-card">
+      <div class="stat-label">Algorithms</div>
+      <div class="stat-val">4</div>
+      <div class="stat-sub">This lesson</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Topics</div>
+      <div class="stat-val">MST + SP</div>
+      <div class="stat-sub">Spanning tree & shortest path</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Graph type</div>
+      <div class="stat-val">Weighted</div>
+      <div class="stat-sub">Directed & undirected</div>
+    </div>
+  </div>
+
+  <div class="slabel a4">Animations <em>4 items</em></div>
+
+  <div class="algo-list">
+    <a class="algo-card a4" href="bfs_dfs_animation.html">
+      <div class="algo-num" style="background:#4a7cc7">1</div>
+      <div class="algo-info">
+        <div class="algo-title">BFS &amp; DFS Traversal</div>
+        <div class="algo-sub">Breadth-First · Depth-First · §13.1–13.2</div>
+      </div>
+      <div class="algo-tags">
+        <span class="atag">Queue / Stack</span>
+        <span class="atag">O(V+E)</span>
+      </div>
+      <div class="algo-arrow">›</div>
+    </a>
+
+    <a class="algo-card a4" href="prims_two_examples.html">
+      <div class="algo-num" style="background:#4a9463">2</div>
+      <div class="algo-info">
+        <div class="algo-title">Prim's Algorithm</div>
+        <div class="algo-sub">Minimum Spanning Tree · §13.8.2 · Two examples</div>
+      </div>
+      <div class="algo-tags">
+        <span class="atag">MST</span>
+        <span class="atag">O(E log V)</span>
+      </div>
+      <div class="algo-arrow">›</div>
+    </a>
+
+    <a class="algo-card a5" href="kruskals_example.html">
+      <div class="algo-num" style="background:#c97c2e">3</div>
+      <div class="algo-info">
+        <div class="algo-title">Kruskal's Algorithm</div>
+        <div class="algo-sub">Minimum Spanning Tree · §13.8.3 · Nodes A–F</div>
+      </div>
+      <div class="algo-tags">
+        <span class="atag">Union-Find</span>
+        <span class="atag">O(E log E)</span>
+      </div>
+      <div class="algo-arrow">›</div>
+    </a>
+
+    <a class="algo-card a6" href="dijkstra_example.html">
+      <div class="algo-num" style="background:#b94a4a">4</div>
+      <div class="algo-info">
+        <div class="algo-title">Dijkstra's Algorithm</div>
+        <div class="algo-sub">Shortest Path · §13.8.4 · Fig 13.36 · Start: D</div>
+      </div>
+      <div class="algo-tags">
+        <span class="atag">Priority Queue</span>
+        <span class="atag">O((V+E) log V)</span>
+      </div>
+      <div class="algo-arrow">›</div>
+    </a>
+  </div>
+
+  <div class="slabel a6">Quick reference</div>
+  <div class="table-wrap a6">
+    <div class="table-head">
+      <div class="table-head-title">Complexity Summary</div>
+      <div class="table-head-sub">Chapter 13</div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Algorithm</th>
+          <th>Solves</th>
+          <th>Structure</th>
+          <th>Time</th>
+          <th>Weighted</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>BFS</td><td>Shortest path (unweighted)</td><td class="mono">Queue</td><td class="mono">O(V+E)</td><td>No</td></tr>
+        <tr><td>DFS</td><td>Reachability / cycles</td><td class="mono">Stack</td><td class="mono">O(V+E)</td><td>No</td></tr>
+        <tr><td>Prim's</td><td>Minimum spanning tree</td><td class="mono">Priority Queue</td><td class="mono">O(E log V)</td><td>Yes</td></tr>
+        <tr><td>Kruskal's</td><td>Minimum spanning tree</td><td class="mono">Union-Find</td><td class="mono">O(E log E)</td><td>Yes</td></tr>
+        <tr><td>Dijkstra's</td><td>Shortest path (weighted)</td><td class="mono">Priority Queue</td><td class="mono">O((V+E) log V)</td><td>Yes</td></tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+</body>
+</html>

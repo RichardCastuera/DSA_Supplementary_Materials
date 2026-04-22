@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Prim's Algorithm — Two Examples</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#f5f5f0;color:#1a1a18;padding:20px}
+h1{font-size:20px;font-weight:600;margin-bottom:4px}
+.sub{font-size:13px;color:#666;margin-bottom:18px}
+.tabs{display:flex;gap:8px;margin-bottom:18px}
+.tab{padding:8px 20px;border:1px solid #ccc;border-radius:8px;cursor:pointer;font-size:13px;color:#555;background:#fff;font-weight:500;transition:all .2s}
+.tab:hover{background:#f0f0ea}
+.tab.active{background:#dbeafe;color:#1d4ed8;border-color:#93c5fd;font-weight:600}
+.panel{display:none}.panel.active{display:block}
+.card{background:#fff;border:1px solid #e0e0da;border-radius:12px;padding:16px;margin-bottom:12px}
+.graph-title{font-size:13px;font-weight:600;color:#444;margin-bottom:8px}
+svg{display:block;width:100%}
+.irow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px}
+.ibox{background:#f5f5f0;border:1px solid #e0e0da;border-radius:8px;padding:9px 12px;min-height:52px}
+.ilbl{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.ival{font-size:12px;color:#1a1a18;font-family:'Courier New',monospace;word-break:break-all;line-height:1.5}
+.smsg{font-size:12px;color:#444;background:#f5f5f0;border:1px solid #e0e0da;border-radius:8px;padding:9px 12px;margin-bottom:10px;min-height:40px;line-height:1.6}
+.ctrl{display:flex;gap:7px;margin-bottom:12px;align-items:center;flex-wrap:wrap}
+.btn{padding:7px 16px;border:1px solid #ccc;border-radius:8px;cursor:pointer;font-size:12px;color:#333;background:#fff;font-weight:500;transition:all .15s}
+.btn:hover{background:#f0f0ea}.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.p{background:#dbeafe;color:#1d4ed8;border-color:#93c5fd}
+.btn.p:hover{background:#bfdbfe}
+.sc{font-size:11px;color:#888;margin-left:auto}
+.leg{display:flex;gap:14px;flex-wrap:wrap;margin-top:6px}
+.li{display:flex;align-items:center;gap:6px;font-size:11px;color:#555}
+.ld{width:13px;height:13px;border-radius:50%;flex-shrink:0}
+</style>
+</head>
+<body>
+<h1>Prim's Algorithm Animation</h1>
+<p class="sub">Chapter 13 · 13.8.2 Prim's Algorithm — Two Examples</p>
+
+<div class="tabs">
+  <button class="tab active" onclick="sw('ex1')">Example 13.7 — Fig 13.31</button>
+  <button class="tab" onclick="sw('ex2')">Example 13.8 — Fig 13.32</button>
+</div>
+
+<!-- ======== EXAMPLE 1 ======== -->
+<div class="panel active" id="panel-ex1">
+<div class="card">
+  <div class="graph-title">Graph G — Figure 13.31 (Start from A)</div>
+  <svg viewBox="0 0 580 280" role="img" aria-label="Prim example 1 graph">
+    <!--
+      Nodes matching image exactly:
+      A(100,80)  B(300,80)  E(500,80)
+      C(100,210) D(300,210)
+      Edges: A-B=7, A-C=3, B-C=4, B-D=9, B-E=11, C-D=10
+    -->
+    <!-- EDGES -->
+    <line id="e1-AB" x1="122" y1="80"  x2="278" y2="80"  stroke="#ccc" stroke-width="2.5"/>
+    <text x="200" y="68" text-anchor="middle" font-size="14" fill="#555" font-weight="500">7</text>
+    <line id="e1-AС" x1="100" y1="103" x2="100" y2="187" stroke="#ccc" stroke-width="2.5"/>
+    <text x="82"  y="150" text-anchor="middle" font-size="14" fill="#555" font-weight="500">3</text>
+    <line id="e1-BC" x1="282" y1="98"  x2="118" y2="192" stroke="#ccc" stroke-width="2.5"/>
+    <text x="192" y="155" text-anchor="middle" font-size="14" fill="#555" font-weight="500">4</text>
+    <line id="e1-BD" x1="300" y1="103" x2="300" y2="187" stroke="#ccc" stroke-width="2.5"/>
+    <text x="318" y="150" text-anchor="middle" font-size="14" fill="#555" font-weight="500">9</text>
+    <line id="e1-BE" x1="322" y1="80"  x2="478" y2="80"  stroke="#ccc" stroke-width="2.5"/>
+    <text x="400" y="68" text-anchor="middle" font-size="14" fill="#555" font-weight="500">11</text>
+    <line id="e1-CD" x1="122" y1="210" x2="278" y2="210" stroke="#ccc" stroke-width="2.5"/>
+    <text x="200" y="230" text-anchor="middle" font-size="14" fill="#555" font-weight="500">10</text>
+    <!-- NODES -->
+    <g id="n1-A"><circle cx="100" cy="80"  r="26" fill="#eee" stroke="#888" stroke-width="2"/><text x="100" y="80"  text-anchor="middle" dominant-baseline="central" font-size="16" font-weight="700" fill="#1a1a18">A</text></g>
+    <g id="n1-B"><circle cx="300" cy="80"  r="26" fill="#eee" stroke="#888" stroke-width="2"/><text x="300" y="80"  text-anchor="middle" dominant-baseline="central" font-size="16" font-weight="700" fill="#1a1a18">B</text></g>
+    <g id="n1-E"><circle cx="500" cy="80"  r="26" fill="#eee" stroke="#888" stroke-width="2"/><text x="500" y="80"  text-anchor="middle" dominant-baseline="central" font-size="16" font-weight="700" fill="#1a1a18">E</text></g>
+    <g id="n1-C"><circle cx="100" cy="210" r="26" fill="#eee" stroke="#888" stroke-width="2"/><text x="100" y="210" text-anchor="middle" dominant-baseline="central" font-size="16" font-weight="700" fill="#1a1a18">C</text></g>
+    <g id="n1-D"><circle cx="300" cy="210" r="26" fill="#eee" stroke="#888" stroke-width="2"/><text x="300" y="210" text-anchor="middle" dominant-baseline="central" font-size="16" font-weight="700" fill="#1a1a18">D</text></g>
+  </svg>
+</div>
+<div class="irow">
+  <div class="ibox"><div class="ilbl">Tree vertices</div><div class="ival" id="e1-tree">—</div></div>
+  <div class="ibox"><div class="ilbl">Fringe vertices</div><div class="ival" id="e1-fringe">—</div></div>
+  <div class="ibox"><div class="ilbl">MST edges (total cost)</div><div class="ival" id="e1-mst">—</div></div>
+</div>
+<div class="smsg" id="e1-msg">Press Play or Next Step — Prim's from vertex A (Fig 13.31)</div>
+<div class="ctrl">
+  <button class="btn p" id="e1-play" onclick="e1Play()">▶ Play</button>
+  <button class="btn" id="e1-next" onclick="e1Step()">Next step</button>
+  <button class="btn" onclick="e1Reset()">Reset</button>
+  <span class="sc" id="e1-sc">Step 0 / 5</span>
+</div>
+<div class="leg">
+  <div class="li"><div class="ld" style="background:#378ADD;border:2px solid #185FA5"></div>In MST tree</div>
+  <div class="li"><div class="ld" style="background:#F2C744;border:2px solid #B8860B"></div>Fringe vertex</div>
+  <div class="li"><div class="ld" style="background:#E24B4A;border:2px solid #A32D2D"></div>Being added now</div>
+  <div class="li" style="gap:6px"><div style="width:22px;height:3px;background:#4CAF50;flex-shrink:0;border-radius:2px"></div>MST edge added</div>
+  <div class="li" style="gap:6px"><div style="width:22px;height:0;border-top:3px dashed #F2C744;flex-shrink:0"></div>Fringe edge</div>
+</div>
+</div>
+
+<!-- ======== EXAMPLE 2 ======== -->
+<div class="panel" id="panel-ex2">
+<div class="card">
+  <div class="graph-title">Graph G — Figure 13.32 (Start from D)</div>
+  <svg viewBox="0 0 580 360" role="img" aria-label="Prim example 2 graph">
+    <!--
+      Node layout matching image exactly:
+      A(80,80)   B(280,80)  C(480,80)
+      D(80,200)  E(480,200)
+      F(80,320)  G(480,320)
+      Edges: A-B=6, A-D=4, B-C=7, B-D=8, B-E=6, C-E=4, D-E=14, D-F=5, E-G=8, F-E=7, F-G=10
+    -->
+    <!-- EDGES -->
+    <line id="e2-AB" x1="106" y1="80"  x2="254" y2="80"  stroke="#ccc" stroke-width="2.5"/>
+    <text x="180" y="66" text-anchor="middle" font-size="14" fill="#555" font-weight="500">6</text>
+    <line id="e2-AD" x1="80"  y1="106" x2="80"  y2="174" stroke="#ccc" stroke-width="2.5"/>
+    <text x="60"  y="145" text-anchor="middle" font-size="14" fill="#555" font-weight="500">4</text>
+    <line id="e2-BC" x1="306" y1="80"  x2="454" y2="80"  stroke="#ccc" stroke-width="2.5"/>
+    <text x="380" y="66" text-anchor="middle" font-size="14" fill="#555" font-weight="500">7</text>
+    <line id="e2-BD" x1="262" y1="98"  x2="98"  y2="182" stroke="#ccc" stroke-width="2.5"/>
+    <text x="172" y="148" text-anchor="middle" font-size="14" fill="#555" font-weight="500">8</text>
+    <line id="e2-BE" x1="306" y1="95"  x2="454" y2="185" stroke="#ccc" stroke-width="2.5"/>
+    <text x="388" y="132" text-anchor="middle" font-size="14" fill="#555" font-weight="500">6</text>
+    <line id="e2-CE" x1="480" y1="106" x2="480" y2="174" stroke="#ccc" stroke-width="2.5"/>
+    <text x="500" y="145" text-anchor="middle" font-size="14" fill="#555" font-weight="500">4</text>
+    <line id="e2-DE" x1="106" y1="200" x2="454" y2="200" stroke="#ccc" stroke-width="2.5"/>
+    <text x="280" y="190" text-anchor="middle" font-size="14" fill="#555" font-weight="500">14</text>
+    <line id="e2-DF" x1="80"  y1="226" x2="80"  y2="294" stroke="#ccc" stroke-width="2.5"/>
+    <text x="60"  y="265" text-anchor="middle" font-size="14" fill="#555" font-weight="500">5</text>
+    <line id="e2-EG" x1="480" y1="226" x2="480" y2="294" stroke="#ccc" stroke-width="2.5"/>
+    <text x="500" y="265" text-anchor="middle" font-size="14" fill="#555" font-weight="500">8</text>
+    <line id="e2-FE" x1="106" y1="308" x2="454" y2="212" stroke="#ccc" stroke-width="2.5"/>
+    <text x="295" y="268" text-anchor="middle" font-size="14" fill="#555" font-weight="500">7</text>
+    <line id="e2-FG" x1="106" y1="320" x2="454" y2="320" stroke="#ccc" stroke-width="2.5"/>
+    <text x="280" y="338" text-anchor="middle" font-size="14" fill="#555" font-weight="500">10</text>
+    <!-- NODES -->
+    <g id="n2-A"><circle cx="80"  cy="80"  r="26" fill="#eee" stroke="#888" stroke-width="2"/><text x="80"  y="80"  text-anchor="middle" dominant-baseline="central" font-size="16" font-weight="700" fill="#1a1a18">A</text></g>
+    <g id="n2-B"><circle cx="280" cy="80"  r="26" fill="#eee" stroke="#888" stroke-width="2"/><text x="280" y="80"  text-anchor="middle" dominant-baseline="central" font-size="16" font-weight="700" fill="#1a1a18">B</text></g>
+    <g id="n2-C"><circle cx="480" cy="80"  r="26" fill="#eee" stroke="#888" stroke-width="2"/><text x="480" y="80"  text-anchor="middle" dominant-baseline="central" font-size="16" font-weight="700" fill="#1a1a18">C</text></g>
+    <g id="n2-D"><circle cx="80"  cy="200" r="26" fill="#eee" stroke="#888" stroke-width="2"/><text x="80"  y="200" text-anchor="middle" dominant-baseline="central" font-size="16" font-weight="700" fill="#1a1a18">D</text></g>
+    <g id="n2-E"><circle cx="480" cy="200" r="26" fill="#eee" stroke="#888" stroke-width="2"/><text x="480" y="200" text-anchor="middle" dominant-baseline="central" font-size="16" font-weight="700" fill="#1a1a18">E</text></g>
+    <g id="n2-F"><circle cx="80"  cy="320" r="26" fill="#eee" stroke="#888" stroke-width="2"/><text x="80"  y="320" text-anchor="middle" dominant-baseline="central" font-size="16" font-weight="700" fill="#1a1a18">F</text></g>
+    <g id="n2-G"><circle cx="480" cy="320" r="26" fill="#eee" stroke="#888" stroke-width="2"/><text x="480" y="320" text-anchor="middle" dominant-baseline="central" font-size="16" font-weight="700" fill="#1a1a18">G</text></g>
+  </svg>
+</div>
+<div class="irow">
+  <div class="ibox"><div class="ilbl">Tree vertices</div><div class="ival" id="e2-tree">—</div></div>
+  <div class="ibox"><div class="ilbl">Fringe vertices</div><div class="ival" id="e2-fringe">—</div></div>
+  <div class="ibox"><div class="ilbl">MST edges (total cost)</div><div class="ival" id="e2-mst">—</div></div>
+</div>
+<div class="smsg" id="e2-msg">Press Play or Next Step — Prim's from vertex D (Fig 13.32)</div>
+<div class="ctrl">
+  <button class="btn p" id="e2-play" onclick="e2Play()">▶ Play</button>
+  <button class="btn" id="e2-next" onclick="e2Step()">Next step</button>
+  <button class="btn" onclick="e2Reset()">Reset</button>
+  <span class="sc" id="e2-sc">Step 0 / 7</span>
+</div>
+<div class="leg">
+  <div class="li"><div class="ld" style="background:#378ADD;border:2px solid #185FA5"></div>In MST tree</div>
+  <div class="li"><div class="ld" style="background:#F2C744;border:2px solid #B8860B"></div>Fringe vertex</div>
+  <div class="li"><div class="ld" style="background:#E24B4A;border:2px solid #A32D2D"></div>Being added now</div>
+  <div class="li" style="gap:6px"><div style="width:22px;height:3px;background:#4CAF50;flex-shrink:0;border-radius:2px"></div>MST edge added</div>
+  <div class="li" style="gap:6px"><div style="width:22px;height:0;border-top:3px dashed #F2C744;flex-shrink:0"></div>Fringe edge</div>
+</div>
+</div>
+
+<script>
+function sw(t){['ex1','ex2'].forEach((id,i)=>{document.querySelectorAll('.tab')[i].classList.toggle('active',id===t);document.getElementById('panel-'+id).classList.toggle('active',id===t);});}
+
+function cN(pfx,id,type){
+  const g=document.getElementById(pfx+id);if(!g)return;
+  const c=g.querySelector('circle'),tx=g.querySelector('text');
+  const s={tree:['#378ADD','#185FA5','#fff'],fringe:['#F2C744','#B8860B','#5a4000'],cur:['#E24B4A','#A32D2D','#fff']};
+  if(s[type]){c.setAttribute('fill',s[type][0]);c.setAttribute('stroke',s[type][1]);tx.setAttribute('fill',s[type][2]);}
+  else{c.setAttribute('fill','#eee');c.setAttribute('stroke','#888');tx.setAttribute('fill','#1a1a18');}
+}
+function cE(pfx,id,type){
+  const e=document.getElementById(pfx+id);if(!e)return;
+  if(type==='mst'){e.setAttribute('stroke','#4CAF50');e.setAttribute('stroke-width','4');e.setAttribute('stroke-dasharray','');}
+  else if(type==='fr'){e.setAttribute('stroke','#F2C744');e.setAttribute('stroke-width','2.5');e.setAttribute('stroke-dasharray','6,4');}
+  else{e.setAttribute('stroke','#ccc');e.setAttribute('stroke-width','2.5');e.setAttribute('stroke-dasharray','');}
+}
+
+/* ===== EXAMPLE 1 STEPS =====
+   Graph: A-B=7, A-C=3, B-C=4, B-D=9, B-E=11, C-D=10
+   Start from A
+*/
+const E1=[
+  {
+    tree:['A'], fringe:'B(7), C(3)', mst:'—', cost:0,
+    nc:{A:'tree',B:'fringe',C:'fringe'},
+    ec:{'AB':'fr','AС':'fr'},
+    msg:'Step 1: Choose starting vertex A. Fringe: B(dist 7 via A–B), C(dist 3 via A–C).'
+  },
+  {
+    tree:['A','C'], fringe:'B(4 via C–B)', mst:'A–C (w=3)', cost:3,
+    nc:{A:'tree',C:'cur',B:'fringe'},
+    ec:{'AС':'mst','BC':'fr','AB':'fr'},
+    msg:'Step 3: Min fringe edge = A–C (w=3). Add C to tree. New fringe: B now reachable via C–B (w=4), better than A–B (w=7).'
+  },
+  {
+    tree:['A','C','B'], fringe:'D(9 via B–D)', mst:'A–C, C–B (w=3+4=7)', cost:7,
+    nc:{A:'tree',C:'tree',B:'cur',D:'fringe'},
+    ec:{'AС':'mst','BC':'mst','BD':'fr','BE':'fr'},
+    msg:'Step 5: Min fringe edge = C–B (w=4). Add B to tree. New fringe: D(9 via B–D), E(11 via B–E).'
+  },
+  {
+    tree:['A','C','B','D'], fringe:'E(11 via B–E)', mst:'A–C, C–B, B–D (w=7+9=16)', cost:16,
+    nc:{A:'tree',C:'tree',B:'tree',D:'cur',E:'fringe'},
+    ec:{'AС':'mst','BC':'mst','BD':'mst','BE':'fr'},
+    msg:'Step 7: Min fringe edge = B–D (w=9). Add D to tree. Fringe: E(11 via B–E).'
+  },
+  {
+    tree:['A','C','B','D','E'], fringe:'—', mst:'A–C, C–B, B–D, B–E (total=27)', cost:27,
+    nc:{A:'tree',C:'tree',B:'tree',D:'tree',E:'cur'},
+    ec:{'AС':'mst','BC':'mst','BD':'mst','BE':'mst'},
+    msg:'Step 8: Min fringe edge = B–E (w=11). Add E. No more fringe. MST complete! Total weight = 3+4+9+11 = 27'
+  },
+];
+let e1I=0,e1T=null;
+const E1_NODES=['A','B','C','D','E'];
+const E1_EDGES=['AB','AС','BC','BD','BE','CD'];
+function e1Apply(s){
+  E1_NODES.forEach(n=>cN('n1-',n,null));
+  E1_EDGES.forEach(e=>cE('e1-',e,null));
+  Object.entries(s.nc).forEach(([n,t])=>cN('n1-',n,t));
+  Object.entries(s.ec).forEach(([e,t])=>cE('e1-',e,t));
+  document.getElementById('e1-tree').textContent=s.tree.join(', ');
+  document.getElementById('e1-fringe').textContent=s.fringe;
+  document.getElementById('e1-mst').textContent=s.mst;
+  document.getElementById('e1-msg').textContent=s.msg;
+  document.getElementById('e1-sc').textContent='Step '+e1I+' / '+E1.length;
+  document.getElementById('e1-next').disabled=e1I>=E1.length;
+  document.getElementById('e1-play').textContent=e1T?'⏸ Pause':'▶ Play';
+}
+function e1Step(){if(e1I<E1.length){e1Apply(E1[e1I]);e1I++;}if(e1I>=E1.length){document.getElementById('e1-next').disabled=true;cE1T();}}
+function cE1T(){if(e1T){clearInterval(e1T);e1T=null;document.getElementById('e1-play').textContent='▶ Play';}}
+function e1Play(){if(e1T){cE1T();return;}if(e1I>=E1.length)e1Reset();e1T=setInterval(()=>{e1Step();if(e1I>=E1.length)cE1T();},1700);document.getElementById('e1-play').textContent='⏸ Pause';}
+function e1Reset(){cE1T();e1I=0;E1_NODES.forEach(n=>cN('n1-',n,null));E1_EDGES.forEach(e=>cE('e1-',e,null));['e1-tree','e1-fringe','e1-mst'].forEach(id=>document.getElementById(id).textContent='—');document.getElementById('e1-msg').textContent="Press Play or Next Step — Prim's from vertex A (Fig 13.31)";document.getElementById('e1-sc').textContent='Step 0 / '+E1.length;document.getElementById('e1-next').disabled=false;document.getElementById('e1-play').textContent='▶ Play';}
+
+/* ===== EXAMPLE 2 STEPS =====
+   Graph: A-B=6, A-D=4, B-C=7, B-D=8, B-E=6, C-E=4, D-E=14, D-F=5, E-G=8, F-E=7, F-G=10
+   Start from D
+*/
+const E2=[
+  {
+    tree:['D'], fringe:'A(4), B(8), E(14), F(5)',
+    mst:'—',
+    nc:{D:'tree',A:'fringe',B:'fringe',E:'fringe',F:'fringe'},
+    ec:{AD:'fr',BD:'fr',DE:'fr',DF:'fr'},
+    msg:'Step 1: Choose starting vertex D. Fringe: A(4 via A–D), F(5 via D–F), B(8 via B–D), E(14 via D–E).'
+  },
+  {
+    tree:['D','A'], fringe:'F(5), B(6 via A–B), E(14)',
+    mst:'D–A (w=4)',
+    nc:{D:'tree',A:'cur',B:'fringe',E:'fringe',F:'fringe'},
+    ec:{AD:'mst',AB:'fr',BD:'fr',DE:'fr',DF:'fr'},
+    msg:'Step 2: Min fringe = D–A (w=4). Add A. New fringe: B now reachable via A–B (w=6), better than B–D (w=8).'
+  },
+  {
+    tree:['D','A','F'], fringe:'B(6), E(7 via F–E)',
+    mst:'D–A, D–F (w=4+5=9)',
+    nc:{D:'tree',A:'tree',F:'cur',B:'fringe',E:'fringe'},
+    ec:{AD:'mst',DF:'mst',AB:'fr',FE:'fr',BD:'fr'},
+    msg:'Step 3: Min fringe = D–F (w=5). Add F. E now reachable via F–E (w=7), better than D–E (w=14).'
+  },
+  {
+    tree:['D','A','F','B'], fringe:'E(6 via B–E), C(7 via B–C)',
+    mst:'D–A, D–F, A–B (w=9+6=15)',
+    nc:{D:'tree',A:'tree',F:'tree',B:'cur',E:'fringe',C:'fringe'},
+    ec:{AD:'mst',DF:'mst',AB:'mst',BE:'fr',BC:'fr',FE:'fr'},
+    msg:'Step 4: Min fringe = A–B (w=6). Add B. Fringe: E(6 via B–E), C(7 via B–C).'
+  },
+  {
+    tree:['D','A','F','B','E'], fringe:'C(4 via C–E)',
+    mst:'D–A, D–F, A–B, B–E (w=15+6=21)',
+    nc:{D:'tree',A:'tree',F:'tree',B:'tree',E:'cur',C:'fringe'},
+    ec:{AD:'mst',DF:'mst',AB:'mst',BE:'mst',CE:'fr',BC:'fr'},
+    msg:'Step 5: Min fringe = B–E (w=6). Add E. C now reachable via C–E (w=4), better than B–C (w=7).'
+  },
+  {
+    tree:['D','A','F','B','E','C'], fringe:'G(8 via E–G)',
+    mst:'D–A, D–F, A–B, B–E, C–E (w=21+4=25)',
+    nc:{D:'tree',A:'tree',F:'tree',B:'tree',E:'tree',C:'cur',G:'fringe'},
+    ec:{AD:'mst',DF:'mst',AB:'mst',BE:'mst',CE:'mst',EG:'fr'},
+    msg:'Step 6: Min fringe = C–E (w=4). Add C. New fringe: G(8 via E–G).'
+  },
+  {
+    tree:['D','A','F','B','E','C','G'], fringe:'—',
+    mst:'D–A, D–F, A–B, B–E, C–E, E–G (w=25+8=33)',
+    nc:{D:'tree',A:'tree',F:'tree',B:'tree',E:'tree',C:'tree',G:'cur'},
+    ec:{AD:'mst',DF:'mst',AB:'mst',BE:'mst',CE:'mst',EG:'mst'},
+    msg:'Step 7: Min fringe = E–G (w=8). Add G. All 7 nodes in tree. MST complete! Total = 4+5+6+6+4+8 = 33'
+  },
+];
+let e2I=0,e2T=null;
+const E2_NODES=['A','B','C','D','E','F','G'];
+const E2_EDGES=['AB','AD','BC','BD','BE','CE','DE','DF','EG','FE','FG'];
+function e2Apply(s){
+  E2_NODES.forEach(n=>cN('n2-',n,null));
+  E2_EDGES.forEach(e=>cE('e2-',e,null));
+  Object.entries(s.nc).forEach(([n,t])=>cN('n2-',n,t));
+  Object.entries(s.ec).forEach(([e,t])=>cE('e2-',e,t));
+  document.getElementById('e2-tree').textContent=s.tree.join(', ');
+  document.getElementById('e2-fringe').textContent=s.fringe;
+  document.getElementById('e2-mst').textContent=s.mst;
+  document.getElementById('e2-msg').textContent=s.msg;
+  document.getElementById('e2-sc').textContent='Step '+e2I+' / '+E2.length;
+  document.getElementById('e2-next').disabled=e2I>=E2.length;
+  document.getElementById('e2-play').textContent=e2T?'⏸ Pause':'▶ Play';
+}
+function e2Step(){if(e2I<E2.length){e2Apply(E2[e2I]);e2I++;}if(e2I>=E2.length){document.getElementById('e2-next').disabled=true;cE2T();}}
+function cE2T(){if(e2T){clearInterval(e2T);e2T=null;document.getElementById('e2-play').textContent='▶ Play';}}
+function e2Play(){if(e2T){cE2T();return;}if(e2I>=E2.length)e2Reset();e2T=setInterval(()=>{e2Step();if(e2I>=E2.length)cE2T();},1700);document.getElementById('e2-play').textContent='⏸ Pause';}
+function e2Reset(){cE2T();e2I=0;E2_NODES.forEach(n=>cN('n2-',n,null));E2_EDGES.forEach(e=>cE('e2-',e,null));['e2-tree','e2-fringe','e2-mst'].forEach(id=>document.getElementById(id).textContent='—');document.getElementById('e2-msg').textContent="Press Play or Next Step — Prim's from vertex D (Fig 13.32)";document.getElementById('e2-sc').textContent='Step 0 / '+E2.length;document.getElementById('e2-next').disabled=false;document.getElementById('e2-play').textContent='▶ Play';}
+</script>
+</body>
+</html>
