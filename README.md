@@ -9,7 +9,7 @@ Interactive step-by-step animations for the four fundamental graph algorithms co
 
 Deploy via GitHub Pages and access at:
 ```
-https://<your-username>.github.io/<repo-name>/
+https://richardcastuera.github.io/DSA_Supplementary_Materials/
 ```
 
 ---
@@ -50,29 +50,5 @@ Every page also has a **← Back to Lesson 7** link at the top to return to the 
 
 ---
 
-## Deploying to GitHub Pages
-
-1. Push all files to the **root** of your repository's `main` branch
-2. Go to **Settings → Pages**
-3. Set source to **Deploy from a branch → main → / (root)**
-4. Save — your site will be live in a few seconds
-
-> All 5 files must be in the same folder for the links between pages to work.
-
----
-
-## File Structure
-
-```
-/
-├── index.html
-├── bfs_dfs_animation.html
-├── prims_two_examples.html
-├── kruskals_example.html
-├── dijkstra_example.html
-└── README.md
-```
-
----
 
 *Chapter 13 · Data Structures and Algorithms*
